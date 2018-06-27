@@ -1,0 +1,96 @@
+{% extends '__base__.html' %}
+
+{% block title %}编辑日志{% endblock %}
+
+{% block beforehead %}
+
+<script>
+$(function () {
+	var vm = new Vue({
+		el: "#vm",
+		data: {
+			name: "",
+			summary: "",
+			content: ""
+		},
+		methods:{
+			submit: function(e){
+				e.preventDefault();
+				if ((! this.name) | (! this.name.trim())) {
+					alert('请输入博客name');
+					return false;
+				}
+				if ((! this.summary) | (! this.summary.trim())) {
+					alert('请输入博客summary');
+					return false;
+				}
+				if ((! this.content) | (! this.content.trim())) {
+					alert('请输入博客content');
+					return false;
+				}
+				$.ajax({
+					type: "POST",
+					url: "/api/create_blog",
+					data: {
+						name: this.name,
+						summary: this.summary,
+						content: this.content
+					},
+					success: function(data,status){
+						if(status == "success"){
+							location.href='/api/blogs/' + data.id;
+						}
+					}
+				});
+			}
+		}
+	});
+});
+</script>
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="uk-width-1-1 uk-margin-bottom">
+        <div class="uk-panel uk-panel-box">
+            <ul class="uk-breadcrumb">
+                <li><a href="/manage/comments">评论</a></li>
+                <li><a href="/manage/blogs">日志</a></li>
+                <li><a href="/manage/users">用户</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="error" class="uk-width-1-1">
+    </div>
+
+    <div class="uk-width-2-3">
+        <form id="vm" v-on:submit="submit" class="uk-form uk-form-stacked">
+            <div class="uk-alert uk-alert-danger uk-hidden"></div>
+            <div class="uk-form-row">
+                <label class="uk-form-label">标题:</label>
+                <div class="uk-form-controls">
+                    <input v-model.lazy="name" type="text" placeholder="标题" class="uk-width-1-1">
+                </div>
+            </div>
+            <div class="uk-form-row">
+                <label class="uk-form-label">摘要:</label>
+                <div class="uk-form-controls">
+                    <textarea v-model.lazy="summary" rows="4" placeholder="摘要" class="uk-width-1-1" style="resize:none;"></textarea>
+                </div>
+            </div>
+            <div class="uk-form-row">
+                <label class="uk-form-label">内容:</label>
+                <div class="uk-form-controls">
+                    <textarea v-model.lazy="content" rows="16" placeholder="内容" class="uk-width-1-1" style="resize:none;"></textarea>
+                </div>
+            </div>
+            <div class="uk-form-row">
+                <button type="submit" class="uk-button uk-button-primary"><i class="uk-icon-save"></i> 保存</button>
+                <a href="/manage/blogs" class="uk-button"><i class="uk-icon-times"></i> 取消</a>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}
